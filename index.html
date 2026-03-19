@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Malu ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-light: #e8d08a;
+            --bg: #080808;
+            --surface: #111111;
+            --text: #f0ead6;
+            --muted: rgba(240,234,214,0.45);
+            --border: rgba(201,168,76,0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Josefin Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Fundo com estrelas */
+        .stars {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: var(--op); transform: scale(1.2); }
+        }
+
+        /* TELA PRINCIPAL */
+        .screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 50px 48px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 60px rgba(201,168,76,0.07), 0 0 0 1px var(--border);
+        }
+
+        .card::before, .card::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-color: var(--gold);
+            border-style: solid;
+        }
+
+        .card::before { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
+        .card::after  { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
+
+        /* ETAPA */
+        .stage-label {
+            font-size: 0.6rem;
+            letter-spacing: 6px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .stage-label::before,
+        .stage-label::after {
+            content: '';
+            height: 1px;
+            width: 30px;
+            background: var(--border);
+        }
+
+        /* TITULO */
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 36px;
+        }
+
+        /* PERGUNTA */
+        .question {
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            color: var(--gold-light);
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            line-height: 1.8;
+        }
+
+        /* INPUT */
+        .input-wrap {
+            position: relative;
+            margin-bottom: 28px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            padding: 12px 0;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus { border-color: var(--gold); }
+        input[type="text"]::placeholder { color: rgba(240,234,214,0.2); letter-spacing: 2px; }
+
+        /* BOTÃO */
+        .btn {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 11px 38px;
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 0.62rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .btn:hover {
+            background: var(--gold);
+            color: var(--bg);
+        }
+
+        /* ERRO */
+        .error-msg {
+            margin-top: 18px;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: #c0524a;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .error-msg.show { opacity: 1; }
+
+        /* SHAKE */
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.4s ease; }
+
+        /* PROGRESS DOTS */
+        .dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 38px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            border: 1px solid var(--gold);
+            background: transparent;
+            transition: background 0.5s ease;
+        }
+
+        .dot.filled { background: var(--gold); }
+
+        /* TELA FINAL */
+        #final-screen {
+            flex-direction: column;
+        }
+
+        .final-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 60px 52px;
+            max-width: 640px;
+            width: 92%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 80px rgba(201,168,76,0.1);
+            animation: fadeUp 1.2s ease forwards;
+        }
+
+        .final-card::before { content: ''; position: absolute; inset: 0; border-radius: 4px; background: radial-gradient(ellipse at top, rgba(201,168,76,0.05), transparent 60%); pointer-events: none; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .big-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 5rem;
+            font-weight: 300;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .big-sub {
+            font-size: 0.62rem;
+            letter-spacing: 8px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 44px;
+        }
+
+        .letter {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: var(--text);
+            line-height: 2;
+            text-align: left;
+            border-top: 1px solid var(--border);
+            padding-top: 36px;
+            margin-bottom: 36px;
+        }
+
+        .letter p { margin-bottom: 18px; }
+        .letter strong { color: var(--gold-light); font-weight: 400; }
+
+        .signature {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+        }
+
+        /* UNLOCK FLASH */
+        .unlock-flash {
+            position: fixed;
+            inset: 0;
+            background: var(--gold);
+            opacity: 0;
+            z-index: 50;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        /* CORAÇÕES FLUTUANTES */
+        .heart-burst {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        .fheart {
+            position: absolute;
+            font-size: 1.2rem;
+            animation: floatHeart 2.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes floatHeart {
+            0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+            20%  { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-200px) scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Estrelas -->
+<div class="stars" id="stars"></div>
+
+<!-- Flash de desbloqueio -->
+<div class="unlock-flash" id="flash"></div>
+
+<!-- Corações -->
+<div class="heart-burst" id="hearts"></div>
+
+<!-- ETAPA 1 -->
+<div class="screen active" id="screen-1">
+    <div class="card">
+        <div class="stage-label">Fase 1 de 3</div>
+        <div class="dots">
+            <div class="dot filled" id="d1"></div>
+            <div class="dot" id="d2"></div>
+            <div class="dot" id="d3"></div>
+        </div>
+        <p class="card-title">Para acessar o que guardei para você,<br>primeiro preciso saber se é realmente você...</p>
+        <p class="question">Qual é o filme favorito de mimi?</p>
+        <div class="input-wrap">
+            <input type="text" id="ans1" placeholder="sua resposta..." autocomplete="off">
+        </div>
+        <button class="btn" onclick="check(1)">Confirmar</button>
+        <p class="error-msg" id="err1">Hmm... tente de novo 🙃</p>
+    </div>
+</div>
+
+<!-- ETAPA 2 -->
+<div class="screen" id="screen-2">
+    <div class="card">
+        <div class="stage-label">Fase 2 de 3</div>
+        <div class="dots">
+            <div class="dot filled"></div>
+            <div class="dot filled"></div>
+            <div class="dot" ></div>
+        </div>
+        <p class="card-title">Boa... mas ainda não chegou lá.<br>Mais uma.</p>
+        <p class="question">Qual estilo de música mimi mais gosta?</p>
+        <div class="input-wrap">
+            <input type="text" id="ans2" placeholder="sua resposta..." autocomplete="off">
+        </div>
+        <button class="btn" onclick="check(2)">Confirmar</button>
+        <p class="error-msg" id="err2">Quase... mas não era isso 😏</p>
+    </div>
+</div>
+
+<!-- ETAPA 3 -->
+<div class="screen" id="screen-3">
+    <div class="card">
+        <div class="stage-label">Fase 3 de 3</div>
+        <div class="dots">
+            <div class="dot filled"></div>
+            <div class="dot filled"></div>
+            <div class="dot filled"></div>
+        </div>
+        <p class="card-title">Última pergunta.<br>A mais importante de todas.</p>
+        <p class="question">Do que mimi tem medo?</p>
+        <div class="input-wrap">
+            <input type="text" id="ans3" placeholder="sua resposta..." autocomplete="off">
+        </div>
+        <button class="btn" onclick="check(3)">Desbloquear ❤️</button>
+        <p class="error-msg" id="err3">Essa você sabe! Pensa melhor... 👀</p>
+    </div>
+</div>
+
+<!-- TELA FINAL -->
+<div class="screen" id="screen-4" style="overflow-y:auto; align-items:flex-start; padding: 40px 0;">
+    <div class="final-card">
+        <div class="big-number">10</div>
+        <div class="big-sub">meses de nós</div>
+
+        <article class="letter">
+            <p>Minha Malu,</p>
+            <p>Se você está lendo isso, é porque foi esperta o bastante, safadinha. Nesses últimos 10 meses, você me mudou por completo e talvez tenha aceso uma chama no meu coração... Mesmo nos momentos em que tudo parecia estar confuso, nunca tive dúvidas do meu amor por você.</p>
+            <p>10 meses, chegamos até aqui né rs. Muito para alguns, pouco pra outros. A única certeza que tenho dentro desse curto período de tempo, é que quero casar com você. Mesmo com os tapas, as facadas, as chatices.</p>
+            <p>Obrigado por ainda estar comigo e me aguentar, você não é só minha namorada, é a minha melhor amiga, é a pessoa que sinto que posso contar com tudo. Ainda estamos no "nível 10" — pretendo chegar no 100, ou mais!!</p>
+            <p><strong>Eu te amo no agora, eu te amei um dia em outro universo, e eu vou continuar te amando para sempre.</strong></p>
+        </article>
+
+        <p class="signature">Com amor, mimi ❤️</p>
+    </div>
+</div>
+
+<script>
+    // Estrelas
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.cssText = `
+            left: ${Math.random()*100}%;
+            top: ${Math.random()*100}%;
+            --dur: ${2 + Math.random()*4}s;
+            --op: ${0.3 + Math.random()*0.7};
+            animation-delay: ${Math.random()*5}s;
+            width: ${Math.random() > 0.8 ? 3 : 2}px;
+            height: ${Math.random() > 0.8 ? 3 : 2}px;
+        `;
+        starsEl.appendChild(s);
+    }
+
+    const answers = {
+        1: "cara cade meu carro",
+        2: "eletronica",
+        3: "mar"
+    };
+
+    let currentStage = 1;
+
+    function normalize(str) {
+        return str.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9 ]/g, "")
+            .trim();
+    }
+
+    function check(stage) {
+        const input = document.getElementById('ans' + stage);
+        const errEl = document.getElementById('err' + stage);
+        const val = normalize(input.value);
+        const correct = normalize(answers[stage]);
+
+        if (val === correct) {
+            errEl.classList.remove('show');
+            if (stage < 3) {
+                flashTransition(() => {
+                    showScreen(stage + 1);
+                    input.value = '';
+                });
+            } else {
+                burstHearts();
+                flashTransition(() => {
+                    showScreen(4);
+                });
+            }
+        } else {
+            const card = input.closest('.card') || input.closest('.final-card');
+            const cardEl = document.querySelector('#screen-' + stage + ' .card');
+            cardEl.classList.remove('shake');
+            void cardEl.offsetWidth;
+            cardEl.classList.add('shake');
+            errEl.classList.add('show');
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    function showScreen(n) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const next = document.getElementById('screen-' + n);
+        if (next) {
+            next.classList.add('active');
+            const inp = next.querySelector('input');
+            if (inp) setTimeout(() => inp.focus(), 300);
+        }
+    }
+
+    function flashTransition(cb) {
+        const fl = document.getElementById('flash');
+        fl.style.opacity = '0.15';
+        setTimeout(() => {
+            fl.style.opacity = '0';
+            cb();
+        }, 350);
+    }
+
+    function burstHearts() {
+        const container = document.getElementById('hearts');
+        const emojis = ['❤️','🧡','💛','🤍','💖','💗'];
+        for (let i = 0; i < 22; i++) {
+            const h = document.createElement('div');
+            h.className = 'fheart';
+            h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            h.style.cssText = `
+                left: ${10 + Math.random()*80}%;
+                bottom: ${10 + Math.random()*30}%;
+                animation-delay: ${Math.random()*1.2}s;
+                font-size: ${0.8 + Math.random()*1.4}rem;
+            `;
+            container.appendChild(h);
+            setTimeout(() => h.remove(), 4000);
+        }
+    }
+
+    // Enter para avançar
+    document.querySelectorAll('input').forEach((inp, i) => {
+        inp.addEventListener('keypress', e => {
+            if (e.key === 'Enter') check(i + 1);
+        });
+    });
+</script>
+</body>
+</html>
